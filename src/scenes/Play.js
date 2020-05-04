@@ -9,6 +9,11 @@ class Play extends Phaser.Scene {
         this.load.image('runner', './assets/runner.png');
         this.load.image('over', './assets/gameoverscreen.png');
         this.load.image('playsky', './assets/playskybackground.png');
+    
+        this.load.audio('background', './assets/background.mp3');
+        this.load.audio('jump','./assets/jump.mp3');
+        this.load.audio('dash','./assets/dash.mp3');
+        this.load.audio('die','./assets/explosion38.wav');
 
         //texture atlas's
         this.load.atlas('runnerA', './assets/runnerA.png', './assets/runnerA.json');
@@ -22,6 +27,16 @@ class Play extends Phaser.Scene {
     }
 
     create() {
+
+
+        //loops background music until player restarts
+        this.bgm = this.sound.add('background', {
+            mute:false,
+            volume:0.5,
+            rate:1,
+            loop:true
+        });
+        this.bgm.play();
 
         //animations
         this.anims.create({ 
@@ -37,8 +52,7 @@ class Play extends Phaser.Scene {
             framerate: 5,
             repeat: -1 
         });
-
-        
+      
         
         game.settings.peoplePassed = 0;
         
@@ -46,6 +60,7 @@ class Play extends Phaser.Scene {
         let centerY = game.config.height/2;
 
         this.gameOver = false;
+
 
         //background
         this.add.image(centerX, centerY, 'playsky');
@@ -96,22 +111,39 @@ class Play extends Phaser.Scene {
         }
 
         this.score = this.add.text(69, 54, "People who've passed you: " + game.settings.peoplePassed, scoreConfig);
-
     }
-
     update() {
 
-        
+        //aduio for all player movements
+        if(Phaser.Input.Keyboard.JustDown(keyUP)){
+            this.sound.play('jump');
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
+            this.sound.play('jump');
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
+            this.sound.play('dash');
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyLEFT)){
+            this.sound.play('dash');
+        }
+        // Players when player dies but plays nonstop:(
+        //if(this.gameOver){
+           // this.sound.play('die');
+       // }
         
         // check key input for restart
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
             //might help with score later?
             //this.scene.restart(this.p1Score);
             this.scene.restart();
+            this.bgm.stop();
         }
 
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyM)) {
             this.scene.start("menuScene");
+            this.bgm.stop();
         }
 
         //tilesprite movement
@@ -180,6 +212,7 @@ class Play extends Phaser.Scene {
     }
 
     checkCollision(player, runner) {
+        
         //runner width and height being set to 0 on reset? hard code quick fix.
         this.width = 48;
         this.height = 48;
@@ -190,7 +223,9 @@ class Play extends Phaser.Scene {
             player.height + player.y > runner.y) {
                 return true;
         } else {
+            
             return false;
+            
         }
     }
 }
