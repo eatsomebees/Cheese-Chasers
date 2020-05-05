@@ -60,8 +60,7 @@ class Play extends Phaser.Scene {
             framerate: 5,
             repeat: -1 
         });
-      
-        
+            
         game.settings.peoplePassed = 0;
         
         let centerX = game.config.width/2;
