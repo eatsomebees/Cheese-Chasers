@@ -1,14 +1,17 @@
 /*
 William Gadd
 Kenice Washington
-Ben Tingley
 
 Title: Cheese Chasers
 
-Date Completed:
+Date Completed: 5/4/2020
 
-Creative tilt: Handcrafted sprites create an atmosphere that evokes
-some of the real life thrill of the chase.
+Creative tilts:
+visual style: Handcrafted, animated sprites create an atmosphere that evokes
+some of the real life thrill of the chase. (Used aseprite)
+technically interesting aspect:  learned how to create animations w/ aseprite. 
+
+
 
 */
 let config = {

@@ -18,6 +18,7 @@ class Play extends Phaser.Scene {
         //texture atlas's
         this.load.atlas('runnerA', './assets/runnerA.png', './assets/runnerA.json');
         this.load.atlas('playerA', './assets/playerA.png', './assets/playerA.json');
+        this.load.atlas('cheeseA', './assets/cheeseA.png', './assets/cheeseA.json');
 
         //tilesprite scrolling bois
         this.load.image('grass1', './assets/grasslayer1.png')
@@ -52,8 +53,14 @@ class Play extends Phaser.Scene {
             framerate: 5,
             repeat: -1 
         });
-      
-        
+
+        this.anims.create({ 
+            key: 'roll', 
+            frames: this.anims.generateFrameNames('cheeseA', {prefix: 'cheeseA', start: 0, end: 11, suffix: '', zeroPad: 4 }),
+            framerate: 5,
+            repeat: -1 
+        });
+            
         game.settings.peoplePassed = 0;
         
         let centerX = game.config.width/2;
@@ -69,6 +76,9 @@ class Play extends Phaser.Scene {
         this.grass1 = this.add.tileSprite(0, 0, 960, 640, 'grass1').setOrigin(0, 0);
         this.grass2 = this.add.tileSprite(0, 0, 960, 640, 'grass2').setOrigin(0, 0);
         this.grass3 = this.add.tileSprite(0, 0, 960, 640, 'grass3').setOrigin(0, 0);
+
+        //cheese animation
+        this.add.sprite(25,165, 'cheeseA').setOrigin(0, 0).play('roll');
 
         //player
         this.p1= new Player(this, centerX/2, centerY+60, 'playerA').setOrigin(0, 0).play('run');
@@ -147,9 +157,9 @@ class Play extends Phaser.Scene {
         }
 
         //tilesprite movement
-        this.grass1.tilePositionX += 2;
-        this.grass2.tilePositionX += 4;
-        this.grass3.tilePositionX += 6;
+        this.grass1.tilePositionX -= 2;
+        this.grass2.tilePositionX -= 4;
+        this.grass3.tilePositionX -= 6;
 
         if(!this.gameOver)
         {
