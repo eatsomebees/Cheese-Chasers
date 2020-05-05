@@ -9,10 +9,16 @@ class Play extends Phaser.Scene {
         this.load.image('runner', './assets/runner.png');
         this.load.image('over', './assets/gameoverscreen.png');
         this.load.image('playsky', './assets/playskybackground.png');
+    
+        this.load.audio('background', './assets/background.mp3');
+        this.load.audio('jump','./assets/jump.mp3');
+        this.load.audio('dash','./assets/dash.mp3');
+        this.load.audio('die','./assets/explosion38.wav');
 
         //texture atlas's
         this.load.atlas('runnerA', './assets/runnerA.png', './assets/runnerA.json');
         this.load.atlas('playerA', './assets/playerA.png', './assets/playerA.json');
+        this.load.atlas('cheeseA', './assets/cheeseA.png', './assets/cheeseA.json');
 
         //tilesprite scrolling bois
         this.load.image('grass1', './assets/grasslayer1.png')
@@ -22,6 +28,16 @@ class Play extends Phaser.Scene {
     }
 
     create() {
+
+
+        //loops background music until player restarts
+        this.bgm = this.sound.add('background', {
+            mute:false,
+            volume:0.5,
+            rate:1,
+            loop:true
+        });
+        this.bgm.play();
 
         //animations
         this.anims.create({ 
@@ -38,7 +54,13 @@ class Play extends Phaser.Scene {
             repeat: -1 
         });
 
-        
+        this.anims.create({ 
+            key: 'roll', 
+            frames: this.anims.generateFrameNames('cheeseA', {prefix: 'cheeseA', start: 0, end: 11, suffix: '', zeroPad: 4 }),
+            framerate: 5,
+            repeat: -1 
+        });
+      
         
         game.settings.peoplePassed = 0;
         
@@ -47,6 +69,7 @@ class Play extends Phaser.Scene {
 
         this.gameOver = false;
 
+
         //background
         this.add.image(centerX, centerY, 'playsky');
 
@@ -54,6 +77,9 @@ class Play extends Phaser.Scene {
         this.grass1 = this.add.tileSprite(0, 0, 960, 640, 'grass1').setOrigin(0, 0);
         this.grass2 = this.add.tileSprite(0, 0, 960, 640, 'grass2').setOrigin(0, 0);
         this.grass3 = this.add.tileSprite(0, 0, 960, 640, 'grass3').setOrigin(0, 0);
+
+        //cheese animation
+        this.add.sprite(25,165, 'cheeseA').setOrigin(0, 0).play('roll');
 
         //player
         this.p1= new Player(this, centerX/2, centerY+60, 'playerA').setOrigin(0, 0).play('run');
@@ -96,28 +122,45 @@ class Play extends Phaser.Scene {
         }
 
         this.score = this.add.text(69, 54, "People who've passed you: " + game.settings.peoplePassed, scoreConfig);
-
     }
-
     update() {
 
-        
+        //aduio for all player movements
+        if(Phaser.Input.Keyboard.JustDown(keyUP)){
+            this.sound.play('jump');
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
+            this.sound.play('jump');
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
+            this.sound.play('dash');
+        }
+        if(Phaser.Input.Keyboard.JustDown(keyLEFT)){
+            this.sound.play('dash');
+        }
+        // Players when player dies but plays nonstop:(
+        //if(this.gameOver){
+           // this.sound.play('die');
+       // }
         
         // check key input for restart
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
             //might help with score later?
             //this.scene.restart(this.p1Score);
             this.scene.restart();
+            this.bgm.stop();
         }
 
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyM)) {
             this.scene.start("menuScene");
+            this.bgm.stop();
         }
 
         //tilesprite movement
-        this.grass1.tilePositionX += 2;
-        this.grass2.tilePositionX += 4;
-        this.grass3.tilePositionX += 6;
+        this.grass1.tilePositionX -= 2;
+        this.grass2.tilePositionX -= 4;
+        this.grass3.tilePositionX -= 6;
 
         if(!this.gameOver)
         {
@@ -180,6 +223,7 @@ class Play extends Phaser.Scene {
     }
 
     checkCollision(player, runner) {
+        
         //runner width and height being set to 0 on reset? hard code quick fix.
         this.width = 48;
         this.height = 48;
@@ -190,7 +234,9 @@ class Play extends Phaser.Scene {
             player.height + player.y > runner.y) {
                 return true;
         } else {
+            
             return false;
+            
         }
     }
 }
